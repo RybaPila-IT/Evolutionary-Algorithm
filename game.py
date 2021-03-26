@@ -37,6 +37,7 @@ SPIKE_SPEED = -11
 
 
 class Game:
+
     class Cube:
 
         def __init__(self):
@@ -62,6 +63,13 @@ class Game:
             if self.y_ == L2_BOUND - self.d_ or self.y_ == L1_BOUND:
                 self.j_ = False
 
+        def intersects(self, points):
+            if self.x_ >= points[1][0] or self.x_ + self.d_ <= points[0][0]:
+                return False
+            if self.y_ >= points[0][1] or self.y_ + self.d_ <= points[1][1]:
+                return False
+            return True
+
     # -------------- END OF CUBE -------------- #
 
     class Spike:
@@ -79,6 +87,15 @@ class Game:
         def valid(self):
             return self.p_[len(self.p_) - 1][0] > 0
 
+        def approx_with_rect(self):
+
+            x1 = self.p_[0][0] + 4
+            y1 = max([self.p_[0][1], self.p_[1][1]])
+            x2 = self.p_[2][0] - 4
+            y2 = min([self.p_[2][1], self.p_[1][1]])
+
+            return [(x1, y1), (x2, y2)]
+
     # -------------- END OF SPIKE -------------- #
 
     def __init__(self, width, height, brain=None, seed=1):
@@ -89,6 +106,7 @@ class Game:
         self.spikes = []
         self.spikes_a = 0
         self.time_ = 0
+        self.score_ = 0
         self.brain = brain
         self.seed = seed
 
@@ -96,10 +114,12 @@ class Game:
         if self.spikes_a < SPIKES_A and self.time_ <= 0:
             self.spikes.append(self.Spike(UPPER_SPIKE) if random.random() >= 0.5 else self.Spike(LOWER_SPIKE))
             self.spikes_a += 1
-            self.time_ = random.expovariate(LAMBDA) * FPS
+            self.time_ = max([random.expovariate(LAMBDA) * FPS, 4])
 
     def __check_game_over(self):
-        pass
+        for spike in self.spikes:
+            if self.cube.intersects(spike.approx_with_rect()):
+                self.running = False
 
     def __handle_events(self):
         for event in pygame.event.get():
@@ -129,6 +149,7 @@ class Game:
 
     def __update(self, window_clock):
         self.time_ -= 1
+        self.score_ += 1
         pygame.display.update()
         window_clock.tick(FPS)
 
@@ -143,18 +164,21 @@ class Game:
         window_clock = pygame.time.Clock()
 
         self.running = True
-
+        self.score_ = 0
         # Game loop
         while self.running:
             self.__handle_events()
             self.__generate_spikes()
             self.__move_assets()
+            self.__check_game_over()
             self.__draw_assets(window)
             self.__update(window_clock)
 
         pygame.quit()
 
+        return self.score_
+
 
 if __name__ == '__main__':
     game = Game(DISPLAY_W, DISPLAY_H)
-    game.play()
+    print('Your score is: {}'.format(game.play()))
