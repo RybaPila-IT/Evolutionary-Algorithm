@@ -19,10 +19,11 @@ class Sigmoid:
 
 class Network:
 
-    def __init__(self, layer_sizes, act_func=Sigmoid, seed=1):
-
+    @staticmethod
+    def set_seed(seed=1):
         np.random.seed(seed)
 
+    def __init__(self, layer_sizes, act_func=Sigmoid):
         self.layers_num = len(layer_sizes)
         self.act_func = act_func
         self.biases = [np.random.random(i) for i in layer_sizes[1:]]

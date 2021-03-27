@@ -1,5 +1,6 @@
 import random
 import pygame
+import numpy as np
 
 # Game constants
 FPS = 60
@@ -20,7 +21,7 @@ RED = (255, 0, 0)
 CUBE_BEG_X = 100
 CUBE_BEG_Y = 511
 CUBE_DIM = 70
-CUBE_Y_SPEED = 20
+CUBE_Y_SPEED = 25
 
 # Lines constants
 L_BEG_X = 0
@@ -31,9 +32,13 @@ L2_BOUND = 581
 L_THICK = 20
 
 # Obstacle constants and coordinates
-UPPER_SPIKE = [(DISPLAY_W, L1_BOUND), (DISPLAY_W + 20, L1_BOUND + 50), (DISPLAY_W + 40, L1_BOUND)]
-LOWER_SPIKE = [(DISPLAY_W, L2_BOUND), (DISPLAY_W + 20, L2_BOUND - 50), (DISPLAY_W + 40, L2_BOUND)]
-SPIKE_SPEED = -11
+UPPER_SPIKE = [(DISPLAY_W, L1_BOUND),
+               (DISPLAY_W + 20, L1_BOUND + 50),
+               (DISPLAY_W + 40, L1_BOUND)]
+LOWER_SPIKE = [(DISPLAY_W, L2_BOUND),
+               (DISPLAY_W + 20, L2_BOUND - 50),
+               (DISPLAY_W + 40, L2_BOUND)]
+SPIKE_SPEED = -10
 
 
 class Game:
@@ -48,13 +53,11 @@ class Game:
             self.y_s_ = 0
 
         def jump(self):
-
             if not self.j_:
                 self.j_ = True
                 self.y_s_ = - CUBE_Y_SPEED if self.y_ + self.d_ == L2_BOUND else CUBE_Y_SPEED
 
         def move(self):
-
             if self.y_s_ != 0:
                 self.y_ += self.y_s_
                 self.y_ = min([self.y_, L2_BOUND - self.d_])
@@ -68,6 +71,7 @@ class Game:
                 return False
             if self.y_ >= points[0][1] or self.y_ + self.d_ <= points[1][1]:
                 return False
+
             return True
 
     # -------------- END OF CUBE -------------- #
@@ -88,7 +92,6 @@ class Game:
             return self.p_[len(self.p_) - 1][0] > 0
 
         def approx_with_rect(self):
-
             x1 = self.p_[0][0] + 4
             y1 = max([self.p_[0][1], self.p_[1][1]])
             x2 = self.p_[2][0] - 4
@@ -98,83 +101,118 @@ class Game:
 
     # -------------- END OF SPIKE -------------- #
 
-    def __init__(self, width, height, brain=None, seed=1):
-        self.dw = width
-        self.dh = height
-        self.running = True
-        self.cube = self.Cube()
-        self.spikes = []
-        self.spikes_a = 0
+    def __init__(self, seed=1):
+        self.running_ = True
+        self.cube_ = self.Cube()
+        self.spikes_ = []
+        self.spikes_a_ = 0
         self.time_ = 0
         self.score_ = 0
-        self.brain = brain
-        self.seed = seed
+        self.seed_ = seed
 
-    def __generate_spikes(self):
-        if self.spikes_a < SPIKES_A and self.time_ <= 0:
-            self.spikes.append(self.Spike(UPPER_SPIKE) if random.random() >= 0.5 else self.Spike(LOWER_SPIKE))
-            self.spikes_a += 1
+    def _generate_spikes(self):
+        if self.spikes_a_ < SPIKES_A and self.time_ <= 0:
+            self.spikes_.append(self.Spike(UPPER_SPIKE) if random.random() >= 0.5 else self.Spike(LOWER_SPIKE))
+            self.spikes_a_ += 1
             self.time_ = max([random.expovariate(LAMBDA) * FPS, 4])
 
-    def __check_game_over(self):
-        for spike in self.spikes:
-            if self.cube.intersects(spike.approx_with_rect()):
-                self.running = False
+    def _check_game_over(self):
+        for spike in self.spikes_:
+            if self.cube_.intersects(spike.approx_with_rect()):
+                self.running_ = False
 
-    def __handle_events(self):
+    def _handle_user_events(self, player):
         for event in pygame.event.get():
-            if self.brain is None:
-                if event.type == pygame.QUIT:
-                    self.running = False
-                elif event.type == pygame.KEYDOWN:
+            if event.type == pygame.QUIT:
+                self.running_ = False
+            if player:
+                if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
-                        self.cube.jump()
+                        self.cube_.jump()
 
-    def __move_assets(self):
-        self.cube.move()
-        for spike in self.spikes:
+    def _network_decision(self, brain):
+        if brain is not None:
+            if brain.predict(self._get_game_info()):
+                self.cube_.jump()
+
+    def _move_assets(self):
+        self.cube_.move()
+        for spike in self.spikes_:
             spike.move()
             if not spike.valid():
-                self.spikes.remove(spike)
-                self.spikes_a -= 1
+                self.spikes_.remove(spike)
+                self.spikes_a_ -= 1
 
-    def __draw_assets(self, window):
+    def _draw_assets(self, window):
+        if window is not None:
+            window.fill(WHITE)
+            for spike in self.spikes_:
+                pygame.draw.polygon(window, RED, spike.p_)
+            pygame.draw.rect(window, BLUE, (self.cube_.x_, self.cube_.y_, self.cube_.d_, self.cube_.d_))
+            pygame.draw.line(window, GREY, (L_BEG_X, L1_BEG_Y), (DISPLAY_W, L1_BEG_Y), L_THICK)
+            pygame.draw.line(window, GREY, (L_BEG_X, L2_BEG_Y), (DISPLAY_W, L2_BEG_Y), L_THICK)
 
-        window.fill(WHITE)
-        for spike in self.spikes:
-            pygame.draw.polygon(window, RED, spike.p_)
-        pygame.draw.rect(window, BLUE, (self.cube.x_, self.cube.y_, self.cube.d_, self.cube.d_))
-        pygame.draw.line(window, GREY, (L_BEG_X, L1_BEG_Y), (DISPLAY_W, L1_BEG_Y), L_THICK)
-        pygame.draw.line(window, GREY, (L_BEG_X, L2_BEG_Y), (DISPLAY_W, L2_BEG_Y), L_THICK)
-
-    def __update(self, window_clock):
+    def _update(self, window_clock):
         self.time_ -= 1
         self.score_ += 1
-        pygame.display.update()
-        window_clock.tick(FPS)
+        if window_clock is not None:
+            pygame.display.update()
+            window_clock.tick(FPS)
 
-    def play(self):
+    def _get_game_info(self):
+        """Function responsible for communication with NN.
+
+        :returns normalized list of data where:
+                [0] - nearest lower spike dist to x1 of the cube;
+                [1] - nearest lower spike dist to x2 of the cube;
+                [2] - nearest upper spike dist to x1 of the cube;
+                [3] - nearest upper spike dist to x2 of the cube;
+                [4] - cube y coordinate"""
+        info = np.array([1, 1, 1, 1, self.cube_.y_ / DISPLAY_H]).astype(dtype=np.float32)
+        cube_x2 = self.cube_.x_ + self.cube_.d_
+        cube_x1 = self.cube_.x_
+
+        for spike in self.spikes_:
+            if spike.p_[0][0] >= cube_x2:
+                if spike.p_[1][1] == UPPER_SPIKE[1][1] and info[3] == 1:
+                    info[3] = (spike.p_[0][0] - cube_x2) / DISPLAY_W
+                elif info[1] == 1:
+                    info[1] = (spike.p_[0][0] - cube_x2) / DISPLAY_W
+            if spike.p_[0][0] >= cube_x1:
+                if spike.p_[1][1] == UPPER_SPIKE[1][1] and info[2] == 1:
+                    info[2] = (spike.p_[0][0] - cube_x1) / DISPLAY_W
+                elif info[0] == 1:
+                    info[0] = (spike.p_[0][0] - cube_x1) / DISPLAY_W
+
+        return info
+
+    def play(self, brain=None, graphical=True):
 
         # Pre-gameplay necessary initialization
+        random.seed(self.seed_)
         pygame.init()
-        random.seed(self.seed)
-
         pygame.display.set_caption(TITLE)
-        window = pygame.display.set_mode((DISPLAY_W, DISPLAY_H))
-        window_clock = pygame.time.Clock()
+        window = pygame.display.set_mode((DISPLAY_W, DISPLAY_H)) if graphical else None
+        window_clock = pygame.time.Clock() if graphical else None
 
-        self.running = True
+        # Clearing game insides.
+        self.running_ = True
         self.score_ = 0
+        self.time_ = 0
+        self.spikes_.clear()
+        self.spikes_a_ = 0
+        self.cube_ = self.Cube()
+
         # Game loop
-        while self.running:
-            self.__handle_events()
-            self.__generate_spikes()
-            self.__move_assets()
-            self.__check_game_over()
-            self.__draw_assets(window)
-            self.__update(window_clock)
+        while self.running_:
+            self._handle_user_events(player=(brain is None))
+            self._network_decision(brain)
+            self._generate_spikes()
+            self._move_assets()
+            self._check_game_over()
+            self._draw_assets(window)
+            self._update(window_clock)
 
         pygame.quit()
 
         return self.score_
-
