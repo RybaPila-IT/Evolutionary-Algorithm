@@ -12,7 +12,7 @@ TITLE = 'Geometry-Run'
 
 # Color constants
 WHITE = (255, 255, 255)
-YELLOW = (255, 255, 0)
+MAGENTA = (255, 0, 255)
 GREY = (122, 122, 122)
 BLUE = (0, 0, 255)
 RED = (255, 0, 0)
@@ -42,7 +42,15 @@ SPIKE_SPEED = -10
 
 
 class Game:
+    """Class representing model used for evaluation of individuals.
 
+    Game class, as the name suggests, implements a game. It is an easy and boring variation
+    of common mobile game called Geometry Dash.
+    It`s GI was implemented using pygame module so one should download and install
+    it.
+
+    Game class supports non-graphical gameplay for speeding-up the process of judging
+    which takes place while evolutionary algorithm is running."""
     class Cube:
 
         def __init__(self):
@@ -74,7 +82,7 @@ class Game:
 
             return True
 
-    # -------------- END OF CUBE -------------- #
+    # --------------------------- END OF CUBE --------------------------- #
 
     class Spike:
 
@@ -99,7 +107,7 @@ class Game:
 
             return [(x1, y1), (x2, y2)]
 
-    # -------------- END OF SPIKE -------------- #
+    # --------------------------- END OF SPIKE --------------------------- #
 
     def __init__(self, seed=1):
         self.running_ = True
@@ -151,6 +159,9 @@ class Game:
             pygame.draw.rect(window, BLUE, (self.cube_.x_, self.cube_.y_, self.cube_.d_, self.cube_.d_))
             pygame.draw.line(window, GREY, (L_BEG_X, L1_BEG_Y), (DISPLAY_W, L1_BEG_Y), L_THICK)
             pygame.draw.line(window, GREY, (L_BEG_X, L2_BEG_Y), (DISPLAY_W, L2_BEG_Y), L_THICK)
+            font = pygame.font.SysFont('arial', 50)
+            text = font.render(str(self.score_), True, MAGENTA)
+            window.blit(text, (0, L1_BOUND))
 
     def _update(self, window_clock):
         self.time_ -= 1
@@ -160,7 +171,7 @@ class Game:
             window_clock.tick(FPS)
 
     def _get_game_info(self):
-        """Function responsible for communication with NN.
+        """Function responsible for communication with an individual.
 
         :returns normalized list of data where:
                 [0] - nearest lower spike dist to x1 of the cube;
@@ -187,7 +198,23 @@ class Game:
         return info
 
     def play(self, brain=None, graphical=True):
+        """Main function used for gameplay and model evaluation.
 
+        Function play enables using game 'black-box' evaluating the subject.
+        Result of the evaluation is the distance in x-direction travelled by the cube.
+
+        In order to estimate 'brain' in fast-non-graphical-mode one should pass the individual together with
+        'graphical' set to False. If one would like to see how individual plays (just because one
+        may be curious) 'graphical' parameter should be set to True.
+
+        In order to play a game by oneself 'brain' value should be left as default together
+        with 'graphical' set to True (also default value).
+
+        :parameter brain - an individual which will be evaluated on a model (which is a game).
+        :parameter graphical - information whether show game graphical interface or not.
+
+        :returns score accomplished by a player or an individual.
+         """
         # Pre-gameplay necessary initialization
         random.seed(self.seed_)
         pygame.init()
