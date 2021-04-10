@@ -46,7 +46,7 @@ def evolve(objective_function, initial_population, mutation_strength, crossover_
             best_score = current_best_score
             best_individual = new_population[0][0]
 
-        for index, el in enumerate(new_population[:-ELITE_SIZE]):
+        for index, el in enumerate(new_population[1:-ELITE_SIZE]):
             print(index)
             del new_population[index]
 
@@ -73,9 +73,11 @@ def count_pick_probability(ranked_population):
 
 def elite_tournament(sorted_population, objective_function):
     # population is sorted descending by objective function value
-    sorted_population = [individual[0] for individual in sorted_population]
+    individuals = [individual[0] for individual in sorted_population]
+    scores = [individual[1] for individual in sorted_population]
     population_size = len(sorted_population)
-    probabilities = count_pick_probability(sorted_population)
+    probabilities = count_pick_probability(individuals)
+    print(scores)
 
     current_probability = random.random()
     chosen_individuals = [np.random.randint(0, population_size) for _ in range(TOURNAMENT_SIZE)]
@@ -85,12 +87,11 @@ def elite_tournament(sorted_population, objective_function):
             current_probability = random.random()
             chosen_individuals[index] = np.random.randint(0, population_size)
 
-    first = chosen_individuals[0]
-    second = chosen_individuals[1]
-    if objective_function(brain=sorted_population[first],
-                          graphical=False) < objective_function(brain=sorted_population[second], graphical=False):
+    first_index = chosen_individuals[0]
+    second_index = chosen_individuals[1]
+    if scores[first_index] < scores[second_index]:
         # print('second')
-        return sorted_population[second]
+        return individuals[second_index]
     else:
         # print('first')
-        return sorted_population[first]
+        return individuals[first_index]
