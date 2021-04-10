@@ -23,11 +23,13 @@ def evolve(objective_function, initial_population, mutation_strength, crossover_
     while current_iteration <= iterations:
         print('iteration {}'.format(current_iteration))
         new_population = [el for el in population[0:ELITE_SIZE]]  # elite individuals - ELITE_BEST first individuals
+        new_population_scores = [el[1] for el in new_population]
+        print(new_population_scores)
+        crossed_population = []
         for i in range(population_size):
             parent1 = elite_tournament(population, objective_function)
             parent2 = elite_tournament(population, objective_function)
             probability = random.random()
-            crossed_population = []
             if probability < crossover_probability:
                 new_individual = Network.crossover(parent1, parent2)
                 crossed_population.append(new_individual)
@@ -35,24 +37,20 @@ def evolve(objective_function, initial_population, mutation_strength, crossover_
                 crossed_population.append(parent1)
 
         crossed_population_size = len(crossed_population)
+        print(crossed_population_size)
         for i in range(crossed_population_size):
             new_individual = Network.mutate(crossed_population[i], mutation_strength)
             new_population.append((new_individual, objective_function(brain=new_individual,
                                                                       graphical=False)))
-            # print(new_population[i][1])
 
         new_population = sorted(new_population, key=lambda el: el[1], reverse=True)
         current_best_score = new_population[0][1]
+
         if current_best_score > best_score:
             best_score = current_best_score
             best_individual = new_population[0][0]
 
-        # temp = [el[1] for el in new_population]
-        # print(temp)
-        for index, el in enumerate(new_population[1:-ELITE_SIZE]):
-            print(index)
-            del new_population[index]
-
+        new_population = new_population[:len(new_population) - ELITE_SIZE]
         population = new_population
         current_iteration += 1
 
@@ -95,3 +93,9 @@ def elite_tournament(sorted_population, objective_function):
         return individuals[second_index]
     else:
         return individuals[first_index]
+
+
+def count_average_individual(new_population):
+    population_size = len(new_population)
+    for element in new_population:
+        individual = element[0]
