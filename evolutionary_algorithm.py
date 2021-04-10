@@ -36,9 +36,10 @@ def evolve(objective_function, initial_population, mutation_strength, crossover_
 
         crossed_population_size = len(crossed_population)
         for i in range(crossed_population_size):
-            Network.mutate(crossed_population[i], mutation_strength)
-            new_population.append((crossed_population[i], objective_function(brain=crossed_population[i],
-                                                                             graphical=False)))
+            new_individual = Network.mutate(crossed_population[i], mutation_strength)
+            new_population.append((new_individual, objective_function(brain=new_individual,
+                                                                      graphical=False)))
+            # print(new_population[i][1])
 
         new_population = sorted(new_population, key=lambda el: el[1], reverse=True)
         current_best_score = new_population[0][1]
@@ -46,6 +47,8 @@ def evolve(objective_function, initial_population, mutation_strength, crossover_
             best_score = current_best_score
             best_individual = new_population[0][0]
 
+        # temp = [el[1] for el in new_population]
+        # print(temp)
         for index, el in enumerate(new_population[1:-ELITE_SIZE]):
             print(index)
             del new_population[index]
@@ -77,7 +80,6 @@ def elite_tournament(sorted_population, objective_function):
     scores = [individual[1] for individual in sorted_population]
     population_size = len(sorted_population)
     probabilities = count_pick_probability(individuals)
-    print(scores)
 
     current_probability = random.random()
     chosen_individuals = [np.random.randint(0, population_size) for _ in range(TOURNAMENT_SIZE)]
@@ -90,8 +92,6 @@ def elite_tournament(sorted_population, objective_function):
     first_index = chosen_individuals[0]
     second_index = chosen_individuals[1]
     if scores[first_index] < scores[second_index]:
-        # print('second')
         return individuals[second_index]
     else:
-        # print('first')
         return individuals[first_index]
