@@ -7,41 +7,51 @@ ELITE_SIZE = 3
 
 
 def evolve(objective_function, initial_population, mutation_strength, crossover_probability, iterations):
-    population = initial_population
-    population_size = len(population)
+    population_size = len(initial_population)
+    if population_size == 0:
+        return initial_population
+    population = [(individual, objective_function(brain=individual, graphical=False))
+                  for individual in initial_population]
+    population = sorted(population, key=lambda el: el[1], reverse=True)
     current_iteration = 0
-    current_scores = sorted([objective_function(el) for el in initial_population], key=objective_function, reverse=True)
-    current_best_score = max(current_scores)
-    current_best_individual = population[np.argmax(population)]
-    # elite = [current_scores[i] for i in range(0, ELITE_SIZE)]
+    print('hi')
+    current_best_score = population[0][1]
+    current_best_individual = population[0][0]
     best_individual = current_best_individual
     best_score = current_best_score
 
     while current_iteration <= iterations:
-        new_population = []
+        print('iteration {}'.format(current_iteration))
+        new_population = [el for el in population[0:ELITE_SIZE]]  # elite individuals - ELITE_BEST first individuals
         for i in range(population_size):
             parent1 = elite_tournament(population, objective_function)
             parent2 = elite_tournament(population, objective_function)
             probability = random.random()
+            crossed_population = []
             if probability < crossover_probability:
-                children = [Network.crossover(parent1, parent2) for i in range(0, 2)]
-                new_population.append(children)
+                new_individual = Network.crossover(parent1, parent2)
+                crossed_population.append(new_individual)
             else:
-                new_population.append([parent1, parent2])
+                crossed_population.append(parent1)
 
-        for individual in range(ELITE_SIZE, population_size):
-            Network.mutate(population[individual], mutation_strength)
+        crossed_population_size = len(crossed_population)
+        for i in range(crossed_population_size):
+            Network.mutate(crossed_population[i], mutation_strength)
+            new_population.append((crossed_population[i], objective_function(brain=crossed_population[i],
+                                                                             graphical=False)))
 
-        current_scores = sorted([objective_function(el) for el in new_population])
-        current_best_score = max(current_scores)
+        new_population = sorted(new_population, key=lambda el: el[1], reverse=True)
+        current_best_score = new_population[0][1]
         if current_best_score > best_score:
             best_score = current_best_score
-            best_individual = new_population[np.argmax(current_scores)]
+            best_individual = new_population[0][0]
 
-        for i in current_scores[:-ELITE_SIZE]:
-            del population[i]
+        for index, el in enumerate(new_population[:-ELITE_SIZE]):
+            print(index)
+            del new_population[index]
 
-        iterations += 1
+        population = new_population
+        current_iteration += 1
 
     return best_individual
 
@@ -61,12 +71,12 @@ def count_pick_probability(ranked_population):
     return probabilities
 
 
-def elite_tournament(population, objective_function):
-    population_size = len(population)
-    population = sorted(population, key=objective_function, reverse=True) # TODO: zastanowić się, czy po prostu nie uznać, że przekazujemy posortowane wg wyniku nierosnąco
-    probabilities = count_pick_probability(population)
+def elite_tournament(sorted_population, objective_function):
+    # population is sorted descending by objective function value
+    sorted_population = [individual[0] for individual in sorted_population]
+    population_size = len(sorted_population)
+    probabilities = count_pick_probability(sorted_population)
 
-    # for i in range(population_size):
     current_probability = random.random()
     chosen_individuals = [np.random.randint(0, population_size) for _ in range(TOURNAMENT_SIZE)]
 
@@ -77,14 +87,10 @@ def elite_tournament(population, objective_function):
 
     first = chosen_individuals[0]
     second = chosen_individuals[1]
-    if objective_function(first) < objective_function(second):
-        return second
+    if objective_function(brain=sorted_population[first],
+                          graphical=False) < objective_function(brain=sorted_population[second], graphical=False):
+        # print('second')
+        return sorted_population[second]
     else:
-        return first
-
-
-def temp_func(x):
-    return x
-
-
-elite_tournament([2, 3, 4, 5, 6, 7, 8, 2, 1], temp_func)
+        # print('first')
+        return sorted_population[first]
