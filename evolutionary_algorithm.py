@@ -3,7 +3,7 @@ import numpy as np
 from network import Network
 
 TOURNAMENT_SIZE = 2
-ELITE_SIZE = 2
+ELITE_SIZE = 5
 
 
 def evolve(objective_function, initial_population, mutation_strength, crossover_probability, iterations):
@@ -62,8 +62,8 @@ def evolve(objective_function, initial_population, mutation_strength, crossover_
 #             population[i] = new_element
 
 
-def initialize(population_size):
-    return [Network([5, 1]) for i in range(population_size)]
+def initialize(population_size,):
+    return [Network([5, 1]) for _ in range(population_size)]
 
 
 def count_pick_probability(ranked_population):

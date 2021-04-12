@@ -7,7 +7,7 @@ FPS = 60
 DISPLAY_W = 1200
 DISPLAY_H = 600
 SPIKES_A = 12
-LAMBDA = 1.0
+LAMBDA = 0.6
 TITLE = 'Geometry-Run'
 
 # Color constants
@@ -128,6 +128,8 @@ class Game:
         for spike in self.spikes_:
             if self.cube_.intersects(spike.approx_with_rect()):
                 self.running_ = False
+            if spike.p_[0][0] > (self.cube_.x_ + self.cube_.d_):
+                break
 
     def _handle_user_events(self, player):
         for event in pygame.event.get():
@@ -217,8 +219,9 @@ class Game:
          """
         # Pre-gameplay necessary initialization
         random.seed(self.seed_)
-        pygame.init()
-        pygame.display.set_caption(TITLE)
+        if graphical:
+            pygame.init()
+            pygame.display.set_caption(TITLE)
         window = pygame.display.set_mode((DISPLAY_W, DISPLAY_H)) if graphical else None
         window_clock = pygame.time.Clock() if graphical else None
 
@@ -232,7 +235,10 @@ class Game:
 
         # Game loop
         while self.running_:
-            self._handle_user_events(player=(brain is None))
+
+            if graphical:
+                self._handle_user_events(player=(brain is None))
+
             self._network_decision(brain)
             self._generate_spikes()
             self._move_assets()
@@ -240,6 +246,7 @@ class Game:
             self._draw_assets(window)
             self._update(window_clock)
 
-        pygame.quit()
+        if graphical:
+            pygame.quit()
 
         return self.score_
