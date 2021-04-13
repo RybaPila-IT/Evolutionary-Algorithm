@@ -125,7 +125,9 @@ class Network:
 
         :returns new Network object being the result of the mutation.
         """
-        mutation_w = [w + eta * np.random.standard_normal(size=w.shape) for w in self.weights_]
-        mutation_b = [b + eta * np.random.standard_normal(size=b.shape) for b in self.biases_]
+        mutation_w = [w + eta * np.random.standard_normal(size=w.shape) * np.random.choice([0, 1], size=w.shape)
+                      for w in self.weights_]
+        mutation_b = [b + eta * np.random.standard_normal(size=b.shape) * np.random.choice([0, 1], size=b.shape)
+                      for b in self.biases_]
 
         return Network([0], Sigmoid, weights=mutation_w, biases=mutation_b)

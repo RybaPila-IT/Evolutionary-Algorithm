@@ -21,10 +21,10 @@ if __name__ == '__main__':
     #     if score > b_score:
     #         b_score = score
     #         best = brain
+    # population = 50,mut = 0.1, cross = 0.2, rounds= 100, elite = 5
+    population = evol.initialize(50)
 
-    population = evol.initialize(3)
-
-    best_network = evol.evolve(game.play, population, 4, 0.5, 5)
+    best_network = evol.evolve(game.play, population, 1.0, 0.4, 500)
     # print('Your score is: {} for brain nr: {}'.format(score, idx + 1))
-
+    #game.play()
     print('Your score: {}'.format(game.play(brain=best_network, graphical=True)))
