@@ -1,4 +1,5 @@
 import numpy as np
+import json
 
 
 class Sigmoid:
@@ -131,3 +132,33 @@ class Network:
                       for b in self.biases_]
 
         return Network([0], Sigmoid, weights=mutation_w, biases=mutation_b)
+
+    def save_network(self, file_name):
+        """Store network in json file format.
+        Function will save network into file in json format.
+        :param file_name - name of the file into which network will be saved.
+        """
+        data = {
+            "weights": [w.tolist() for w in self.weights_],
+            "biases": [b.tolist() for b in self.biases_]
+        }
+
+        with open(file_name, 'w') as file:
+            json.dump(data, file)
+
+
+def load_network(file_name):
+    """Function will load network from file.
+    File_name should bo a file containing network parameters
+    specified as the json file format.
+    :param file_name - json file name containing network parameters.
+    :returns network with pre-learned parameters.
+    """
+    with open(file_name) as file:
+        data = json.load(file)
+
+    network = Network([1, 1], act_func=Sigmoid)
+    network.weights_ = [np.array(w) for w in data["weights"]]
+    network.biases_ = [np.array(b) for b in data["biases"]]
+
+    return network
