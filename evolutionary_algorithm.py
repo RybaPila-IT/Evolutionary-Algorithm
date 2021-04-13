@@ -63,7 +63,7 @@ def evolve(objective_function, initial_population, mutation_strength, crossover_
 
 
 def initialize(population_size):
-    return [Network([5, 1]) for i in range(population_size)]
+    return [Network([5, 1]) for _ in range(population_size)]
 
 
 def count_pick_probability(ranked_population):
@@ -94,8 +94,6 @@ def selection_tournament(sorted_population):
 
     first_index = chosen_individuals_indices[0]
     second_index = chosen_individuals_indices[1]
-    # first_index = np.random.randint(0, population_size)
-    # second_index = np.random.randint(0, population_size)
     if scores[first_index] < scores[second_index]:
         return individuals[second_index]
     else:
