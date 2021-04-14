@@ -6,7 +6,8 @@ TOURNAMENT_SIZE = 2
 ELITE_SIZE = 2
 
 
-def evolve(objective_function, initial_population, mutation_strength, crossover_probability, iterations):
+def evolve(objective_function, initial_population, mutation_strength, crossover_probability, iterations,
+           results):
     population_size = len(initial_population)
     if population_size == 0:
         return initial_population
@@ -59,6 +60,7 @@ def evolve(objective_function, initial_population, mutation_strength, crossover_
         # debugging purposes
         print('best: ' + str(best_individual_score))
         print('average: ' + str(average_individual_score))
+        results.append((best_individual_score, average_individual_score))
         current_iteration += 1
 
     return best_individual
