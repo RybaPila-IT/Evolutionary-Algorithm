@@ -24,6 +24,7 @@ def evolve(objective_function, initial_population, mutation_strength, crossover_
         # elite individuals - ELITE_SIZE first individuals
         new_population = [el for el in population[0:ELITE_SIZE]]
         crossed_individuals = []
+
         for i in range(population_size):
             parent1 = selection_tournament(population)
             parent2 = selection_tournament(population)
@@ -55,6 +56,7 @@ def evolve(objective_function, initial_population, mutation_strength, crossover_
         best_individual_score = new_population[0][1]
         average_individual = count_average_individual(new_population)
         average_individual_score = objective_function(brain=average_individual, graphical=False)
+        # debugging purposes
         print('best: ' + str(best_individual_score))
         print('average: ' + str(average_individual_score))
         current_iteration += 1
@@ -67,6 +69,13 @@ def initialize(population_size):
 
 
 def count_pick_probability(ranked_population):
+    """
+    Function counting probability of picking an individual for tournament in tournament selection.
+
+    :parameter ranked_population - population sorted descending by rank according to objective function.
+
+    :returns list of probabilities of getting picked for each individual in the population.
+    """
     population_size = len(ranked_population)
     probabilities = []
     for index, individual in enumerate(ranked_population, start=1):
@@ -101,6 +110,14 @@ def selection_tournament(sorted_population):
 
 
 def count_average_individual(new_population):
+    """
+    Counts the 'average individual' for the population, i. e. an individual with weights and biases averaged
+    over the entire population's weights and biases.
+
+    :parameter new_population - list of population's individuals and their scores.
+
+    :returns a Network object representing the 'average individual' for the population.
+    """
     population_size = len(new_population)
     # we assume non-empty population
     individuals_sum = new_population[0][0]

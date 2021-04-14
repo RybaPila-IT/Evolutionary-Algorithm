@@ -7,7 +7,7 @@ FPS = 60
 DISPLAY_W = 1200
 DISPLAY_H = 600
 SPIKES_A = 12
-LAMBDA = 0.6
+LAMBDA = 0.8
 TITLE = 'Geometry-Run'
 
 # Color constants
