@@ -58,8 +58,8 @@ def evolve(objective_function, initial_population, mutation_strength, crossover_
         average_individual = count_average_individual(new_population)
         average_individual_score = objective_function(brain=average_individual, graphical=False)
         # debugging purposes
-        print('best: ' + str(best_individual_score))
-        print('average: ' + str(average_individual_score))
+        # print('best: ' + str(best_individual_score))
+        # print('average: ' + str(average_individual_score))
         results.append((best_individual_score, average_individual_score))
         current_iteration += 1
 
