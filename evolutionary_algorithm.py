@@ -21,7 +21,7 @@ def evolve(objective_function, initial_population, mutation_strength, crossover_
     best_score = current_best_score
 
     while current_iteration < iterations:
-        print('iteration {}'.format(current_iteration + 1))
+        # print('iteration {}'.format(current_iteration + 1))
         # elite individuals - ELITE_SIZE first individuals
         new_population = [el for el in population[0:ELITE_SIZE]]
         crossed_individuals = []

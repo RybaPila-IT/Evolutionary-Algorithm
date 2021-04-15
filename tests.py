@@ -60,7 +60,7 @@ def test_mutation_strength(iterations=500, number_of_tests=3, population_size=50
                            crossover_probability=0.5):
     current_figure = 1
     current_mutation_strength = start_mutation_strength
-    # tests depending on the population size
+    # tests depending on the mutation strength
     for _ in range(0, number_of_tests):
         test(current_figure, population_size, current_mutation_strength, crossover_probability,
              iterations, 'mutation_strength_test')
@@ -72,7 +72,7 @@ def test_crossover(iterations=500, number_of_tests=3, population_size=50, mutati
                    start_crossover_probability=0.5, crossover_probability_step=0.1):
     current_figure = 1
     current_crossover_probability = start_crossover_probability
-    # tests depending on the population size
+    # tests depending on the crossover probability
     for _ in range(0, number_of_tests):
         test(current_figure, population_size, mutation_strength, current_crossover_probability,
              iterations, 'crossover_test')
