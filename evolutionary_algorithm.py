@@ -1,3 +1,4 @@
+# Author: Julia Skoneczna
 import random
 import numpy as np
 from network import Network
@@ -29,6 +30,8 @@ def evolve(objective_function, initial_population, mutation_strength, crossover_
         for i in range(population_size):
             parent1 = selection_tournament(population)
             parent2 = selection_tournament(population)
+            while parent2 == parent1:
+                parent2 = selection_tournament(population)
             probability = random.random()
             if probability < crossover_probability:
                 new_individual = Network.crossover(parent1, parent2)
@@ -70,22 +73,22 @@ def initialize(population_size):
     return [Network([5, 1]) for _ in range(population_size)]
 
 
-def count_pick_probability(ranked_population):
-    """
-    Function counting probability of picking an individual for tournament in tournament selection.
-
-    :parameter ranked_population - population sorted descending by rank according to objective function.
-
-    :returns list of probabilities of getting picked for each individual in the population.
-    """
-    population_size = len(ranked_population)
-    probabilities = []
-    for index, individual in enumerate(ranked_population, start=1):
-        individual_probability = (1 / population_size ** TOURNAMENT_SIZE) * \
-                                 ((population_size - index + 1) ** TOURNAMENT_SIZE -
-                                  (population_size - index) ** TOURNAMENT_SIZE)
-        probabilities.append(individual_probability)
-    return probabilities
+# def count_pick_probability(ranked_population):
+#     """
+#     Function counting probability of picking an individual for tournament in tournament selection.
+#
+#     :parameter ranked_population - population sorted descending by rank according to objective function.
+#
+#     :returns list of probabilities of getting picked for each individual in the population.
+#     """
+#     population_size = len(ranked_population)
+#     probabilities = []
+#     for index, individual in enumerate(ranked_population, start=1):
+#         individual_probability = (1 / population_size ** TOURNAMENT_SIZE) * \
+#                                  ((population_size - index + 1) ** TOURNAMENT_SIZE -
+#                                   (population_size - index) ** TOURNAMENT_SIZE)
+#         probabilities.append(individual_probability)
+#     return probabilities
 
 
 def selection_tournament(sorted_population):
@@ -93,15 +96,15 @@ def selection_tournament(sorted_population):
     individuals = [individual[0] for individual in sorted_population]
     scores = [individual[1] for individual in sorted_population]
     population_size = len(sorted_population)
-    probabilities = count_pick_probability(individuals)
+    # probabilities = count_pick_probability(individuals)
 
     current_probability = random.random()
     chosen_individuals_indices = [np.random.randint(0, population_size) for _ in range(TOURNAMENT_SIZE)]
 
-    for index, chosen in enumerate(chosen_individuals_indices):
-        while probabilities[chosen] < current_probability:
-            current_probability = random.random()
-            chosen_individuals_indices[index] = np.random.randint(0, population_size)
+    # for index, chosen in enumerate(chosen_individuals_indices):
+        # while probabilities[chosen] < current_probability:
+        #     current_probability = random.random()
+        #     chosen_individuals_indices[index] = np.random.randint(0, population_size)
 
     first_index = chosen_individuals_indices[0]
     second_index = chosen_individuals_indices[1]
