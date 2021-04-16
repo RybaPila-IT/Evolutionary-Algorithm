@@ -9,6 +9,7 @@ import evolutionary_algorithm as evol
 def test(figure_number, population_size, mutation_strength, crossover_probability, max_iterations,
          chart_name):
     best_score_averages = []
+    average_individual_averages = []
     for seed in range(1, 26):
         # Network random machine initialize
         Network.set_seed(seed)
@@ -25,8 +26,10 @@ def test(figure_number, population_size, mutation_strength, crossover_probabilit
         best_scores = [el[0] for el in results]
         average_scores = [el[1] for el in results]
         best_scores_average = sum(best_scores) / max_iterations
+        average_individual_average = sum(average_scores) / max_iterations
         # print('Result: ' + str(best_scores_average))
         best_score_averages.append(best_scores_average)
+        average_individual_averages.append(average_individual_average)
         # best = plt.scatter(iterations, best_scores, s=5, label='najlepszy wynik')
         # plt.xlabel('Iteracja')
         # plt.ylabel('Osiągnięty wynik')
@@ -36,7 +39,10 @@ def test(figure_number, population_size, mutation_strength, crossover_probabilit
         # filename = chart_name + str(figure_number) + '.png'
         # plt.savefig(current_directory + '/charts/' + filename)
     result = sum(best_score_averages) / 25
-    return result
+    average_individual_result = sum(average_individual_averages) / 25
+    final_result = (result, average_individual_result)
+    print('Result: ' + str(final_result))
+    return final_result
 
 
 def test_iterations(start_iterations=10, iterations_step=2, number_of_tests=3,
