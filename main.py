@@ -1,14 +1,13 @@
-from game import Game
-from network import Network
-import evolutionary_algorithm as evol
+# Author: Julia Skoneczna
+import tests
 
 if __name__ == '__main__':
-    # Network random machine initialize
-    Network.set_seed(1)
-    game = Game()
 
-    population = evol.initialize(20)
+    tests.test_iterations(start_iterations=100, iterations_step=200,
+                          population_size=20)
 
-    best_network = evol.evolve(game.play, population, 10, 0.4, 500)
-
-    print('Your score: {}'.format(game.play(brain=best_network, graphical=True)))
+    tests.test_mutation_strength(number_of_tests=[0.5, 2.5, 5.0, 7.5, 13.5])
+    tests.test_crossover(iterations=400, population_size=20, mutation_strength=2.5,
+                         start_crossover_probability=0.1, crossover_probability_step=0.3)
+    tests.test_population_size(iterations=400, start_population_size=20, population_size_step=10,
+                               mutation_strength=2.5, crossover_probability=0.1)
