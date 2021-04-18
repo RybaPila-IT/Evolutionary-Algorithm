@@ -4,7 +4,7 @@ import tests
 if __name__ == '__main__':
 
     tests.test_iterations(start_iterations=100, iterations_step=200,
-                          population_size=50)
+                          population_size=20)
 
     tests.test_mutation_strength(number_of_tests=[0.5, 2.5, 5.0, 7.5, 13.5])
     tests.test_crossover(iterations=400, population_size=20, mutation_strength=2.5,

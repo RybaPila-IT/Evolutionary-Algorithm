@@ -20,9 +20,6 @@ def test(figure_number, population_size, mutation_strength, crossover_probabilit
         population = evol.initialize(population_size)
         best_network = evol.evolve(game.play, population, mutation_strength, crossover_probability,
                                    max_iterations, results)
-        # iterations = [i for i in range(0, max_iterations)]
-        # plt.clf()
-        # print('Your score: {}'.format(game.play(brain=best_network, graphical=True)))
         best_scores = [el[0] for el in results]
         average_scores = [el[1] for el in results]
         best_scores_average = sum(best_scores) / max_iterations
@@ -30,14 +27,6 @@ def test(figure_number, population_size, mutation_strength, crossover_probabilit
         # print('Result: ' + str(best_scores_average))
         best_score_averages.append(best_scores_average)
         average_individual_averages.append(average_individual_average)
-        # best = plt.scatter(iterations, best_scores, s=5, label='najlepszy wynik')
-        # plt.xlabel('Iteracja')
-        # plt.ylabel('Osiągnięty wynik')
-        # average = plt.scatter(iterations, average_scores, s=5, label='średni wynik')
-        # plt.legend(handles=[best, average], bbox_to_anchor=(0, 1, 1, 0), loc="lower left", mode="expand", ncol=2)
-        # current_directory = os.path.dirname(__file__)
-        # filename = chart_name + str(figure_number) + '.png'
-        # plt.savefig(current_directory + '/charts/' + filename)
     result = sum(best_score_averages) / 25
     average_individual_result = sum(average_individual_averages) / 25
     final_result = (result, average_individual_result)
