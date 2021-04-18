@@ -74,18 +74,16 @@ def test_population_size(iterations=500, number_of_tests=3,
     print('Results for population size test: ' + str(results))
 
 
-def test_mutation_strength(iterations=500, number_of_tests=3, population_size=50,
-                           start_mutation_strength=5, mutation_strength_step=3,
+def test_mutation_strength(number_of_tests, iterations=400, population_size=20,
                            crossover_probability=0.5):
     current_figure = 1
-    current_mutation_strength = start_mutation_strength
     results = []
     # tests depending on mutation strength
-    for _ in range(0, number_of_tests):
-        results.append(test(current_figure, population_size, current_mutation_strength, crossover_probability,
+    for t in number_of_tests:
+        results.append(test(current_figure, population_size, t, crossover_probability,
                             iterations, 'mutation_strength_test'))
         current_figure += 1
-        current_mutation_strength += mutation_strength_step
+
     print('Results for mutation strength test: ' + str(results))
 
 

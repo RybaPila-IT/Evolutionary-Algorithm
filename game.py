@@ -1,3 +1,4 @@
+# Author: Radoslaw Radziukiewicz
 import random
 import pygame
 import numpy as np
@@ -7,7 +8,7 @@ FPS = 60
 DISPLAY_W = 1200
 DISPLAY_H = 600
 SPIKES_A = 12
-LAMBDA = 0.8
+LAMBDA = 1.0
 TITLE = 'Geometry-Run'
 
 # Color constants

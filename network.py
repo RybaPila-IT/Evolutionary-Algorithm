@@ -1,3 +1,4 @@
+# Author: Radoslaw Radziukiewicz
 import numpy as np
 import json
 
