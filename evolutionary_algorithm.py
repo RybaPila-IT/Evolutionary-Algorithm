@@ -8,7 +8,7 @@ ELITE_SIZE = 2
 
 
 def evolve(objective_function, initial_population, mutation_strength, crossover_probability, iterations,
-           results):
+           results, verbose=False):
     population_size = len(initial_population)
     if population_size == 0:
         return initial_population
@@ -22,7 +22,8 @@ def evolve(objective_function, initial_population, mutation_strength, crossover_
     best_score = current_best_score
 
     while current_iteration < iterations:
-        # print('iteration {}'.format(current_iteration + 1))
+        if verbose:
+            print('iteration {}'.format(current_iteration + 1))
         # elite individuals - ELITE_SIZE first individuals
         new_population = [el for el in population[0:ELITE_SIZE]]
         crossed_individuals = []
@@ -55,8 +56,9 @@ def evolve(objective_function, initial_population, mutation_strength, crossover_
         new_population = new_population[:len(new_population) - ELITE_SIZE]
         population = new_population
         # debugging purposes
-        # new_population_scores = [el[1] for el in new_population]
-        # print(new_population_scores)
+        if verbose:
+            new_population_scores = [el[1] for el in new_population]
+            print(new_population_scores)
         best_individual_score = new_population[0][1]
         average_individual = count_average_individual(new_population)
         average_individual_score = objective_function(brain=average_individual, graphical=False)
@@ -69,8 +71,8 @@ def evolve(objective_function, initial_population, mutation_strength, crossover_
     return best_individual
 
 
-def initialize(population_size):
-    return [Network([5, 1]) for _ in range(population_size)]
+def initialize(population_size, net_arch=None):
+    return [Network([5, 1] if net_arch is None else net_arch) for _ in range(population_size)]
 
 
 def selection_tournament(sorted_population):
